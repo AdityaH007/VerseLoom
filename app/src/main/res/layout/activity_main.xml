@@ -50,11 +50,12 @@
 
     <EditText
         android:id="@+id/etEmail"
+        android:textColorHint="@color/black"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:hint="Email"
         android:inputType="textEmailAddress"
-        android:textColor="#7B7B7B"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
@@ -67,8 +68,9 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:hint="Password"
+        android:textColorHint="@color/black"
         android:inputType="textPassword"
-        android:textColor="#7B7B7B"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
@@ -81,8 +83,9 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:hint="Name"
+        android:textColorHint="@color/black"
         android:inputType="textPersonName"
-        android:textColor="#7B7B7B"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
@@ -91,16 +94,16 @@
         app:layout_constraintVertical_bias="0.453" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/signupbt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#00000"
+        android:backgroundTint="#00ffffff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.58"
+        app:layout_constraintHorizontal_bias="0.615"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.578"
+        app:layout_constraintVertical_bias="0.558"
         app:srcCompat="@drawable/signup" />
 
     <ImageButton
@@ -113,7 +116,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.769"
 
-        android:background="#00000"
+        android:backgroundTint="#00ffffff"
         app:srcCompat="@drawable/login" />
 
 
