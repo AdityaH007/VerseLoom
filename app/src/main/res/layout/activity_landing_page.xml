@@ -5,6 +5,23 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg3"
     tools:context=".LandingPage">
+
+    <ImageButton
+        android:id="@+id/Profile"
+        android:layout_width="85dp"
+        android:layout_height="84dp"
+        android:background="#00ffffff"
+        android:cropToPadding="true"
+        android:fitsSystemWindows="true"
+        android:clickable="true"
+        android:src="@drawable/contact"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.019" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
