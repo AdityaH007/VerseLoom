@@ -35,6 +35,12 @@ class Profile : AppCompatActivity() {
     private lateinit var saveBtn: Button
     private lateinit var sharedPreferences: SharedPreferences
 
+    //to store current yser data
+    private var currentUser: User? = null
+
+    //store image uri temporarily before upload
+    private var selectedImageUri: Uri? = null
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
