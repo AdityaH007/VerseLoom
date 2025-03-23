@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".view.AIHelpActivity"
+    android:background="@drawable/bg_ai">
+    <!--android:background="@color/white"> -->
+
+
+    <!-- Input EditText -->
+
+    <!-- Generate Button -->
+
+    <!-- Scrollable TextView with ScrollView -->
+
+    <EditText
+        android:id="@+id/inputTextEditText"
+        android:layout_width="353dp"
+        android:layout_height="116dp"
+        android:layout_marginTop="44dp"
+        android:background="@drawable/edittext_background"
+        android:hint="Find your inspiration for today..."
+        android:inputType="textMultiLine"
+        android:minLines="4"
+        android:padding="12dp"
+        android:paddingHorizontal="4dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/generateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        android:backgroundTint="#FFA500"
+        android:padding="12dp"
+        android:text="Find Inpiration"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputTextEditText" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="501dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/generateButton"
+        app:layout_constraintVertical_bias="1.0">
+
+        <TextView
+            android:id="@+id/geminiResponseTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/textview_background"
+            android:padding="12dp"
+            android:text="Gemini Response will appear here."
+            android:textAlignment="center"
+            android:textColor="#333333"
+            android:textSize="16sp" />
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

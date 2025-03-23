@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Dashboard Menu Item -->
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@drawable/ic_draft"
+        android:title="Dashboard" />
+
+    <!-- Main Navigation Items -->
+    <item
+        android:id="@+id/nav_ai_help"
+        android:icon="@drawable/ic_ai_help"
+        android:title="AI Help" />
+
+    <item
+        android:id="@+id/nav_write"
+        android:icon="@drawable/ic_write"
+        android:title="Write" />
+
+    <item
+        android:id="@+id/nav_works"
+        android:icon="@drawable/ic_works"
+        android:title="Works" />
+
+    <item
+        android:id="@+id/nav_explore"
+        android:icon="@drawable/ic_explore"
+        android:title="Explore" />
+
+</menu>

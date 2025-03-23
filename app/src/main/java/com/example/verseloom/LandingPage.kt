@@ -4,22 +4,37 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.verseloom.database.UserViewModel
+import com.example.verseloom.view.AIHelpActivity
+import com.example.verseloom.view.DraftActivity
+import com.example.verseloom.view.ExploreActivity
+import com.example.verseloom.view.WorksActivity
+import com.example.verseloom.view.WriteActivity
+import com.example.verseloom.viewmodel.LandingViewModel
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.button.MaterialButton
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@AndroidEntryPoint
 class LandingPage : AppCompatActivity() {
 
-    private lateinit var profileBtn: ImageButton
+    private lateinit var profileBtn: MaterialButton
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var nameTextView: TextView
+    private val viewModel: UserViewModel by viewModels()
+    private val viewModell: LandingViewModel by viewModels()
+    private lateinit var bottomNavigation: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,20 +46,79 @@ class LandingPage : AppCompatActivity() {
             insets
         }
 
+        // Initialize UI elements
         profileBtn = findViewById(R.id.Profile)
+        nameTextView = findViewById(R.id.textView2)
+        sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        bottomNavigation = findViewById(R.id.bottom_navigation)
+
+        bottomNavigation.selectedItemId = R.id.nav_write
+        //default
+
+
+        //navigation listnere
+        bottomNavigation.setOnItemSelectedListener { item ->
+            viewModell.onNavigationItemSelected(item.itemId)
+            true
+
+        }
+
+        //Observe the selected item to update and navigate
+        viewModell.sellectedItem.observe(this) { navigationItem ->
+            when (navigationItem)
+            {
+                LandingViewModel.NavigationItem.AI_HELP ->
+                {
+                    startActivity(Intent(this, AIHelpActivity::class.java))
+
+                }
+
+                LandingViewModel.NavigationItem.DRAFTS ->
+                {
+                    startActivity(Intent(this, DraftActivity::class.java))
+
+                }
+
+                LandingViewModel.NavigationItem.WRITE ->
+                {
+                    startActivity(Intent(this, WriteActivity::class.java))
+
+                }
+
+                LandingViewModel.NavigationItem.WORKS ->
+                {
+                    startActivity(Intent(this, WorksActivity::class.java))
+
+                }
+
+                LandingViewModel.NavigationItem.EXPLORE ->
+                {
+                    startActivity(Intent(this, ExploreActivity::class.java))
+
+                }
+            }
+
+        }
+
+
+
+        // Set up profile button click listener
         profileBtn.setOnClickListener {
             val intent = Intent(this, Profile::class.java)
             startActivity(intent)
         }
 
-        nameTextView = findViewById(R.id.textView2)
-        sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        // Collect users data from ViewModel
+        lifecycleScope.launch {
+            viewModel.allUsers.collectLatest { users ->
+                // Update UI with users list (implement UI update logic here)
+            }
+        }
 
-        // Initial load
+        // Load saved name initially
         loadSavedNameWithCoroutine()
     }
 
-    // Override onResume to update the name every time the activity comes to the foreground
     override fun onResume() {
         super.onResume()
         // Reload name data when returning to this activity
@@ -53,16 +127,11 @@ class LandingPage : AppCompatActivity() {
 
     private fun loadSavedNameWithCoroutine() {
         lifecycleScope.launch {
-            // Perform the data loading in the background
             val savedName = withContext(Dispatchers.IO) {
-                // This block runs on the IO thread
-                sharedPreferences.getString("USER_NAME", "Venom Snake") // Default name if none saved
+                sharedPreferences.getString("USER_NAME", "Venom Snake") ?: "Venom Snake"
             }
 
-            // Update UI on the main thread
-            withContext(Dispatchers.Main) {
-                nameTextView.text = savedName
-            }
+            nameTextView.text = savedName
         }
     }
 }
