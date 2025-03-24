@@ -21,7 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import android.text.Html
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.verseloom.R
-import com.example.verseloom.WriteViewModel
+import com.example.verseloom.viewmodel.WriteViewModel
 
 @AndroidEntryPoint
 class WriteActivity : AppCompatActivity() {
@@ -70,6 +70,10 @@ class WriteActivity : AppCompatActivity() {
         // Check for draft content to load
         intent.getStringExtra("DRAFT_CONTENT")?.let { draftContent ->
             viewModel.loadDraftContent(draftContent)
+            // Pass the draft ID and Firestore document ID if editing
+            val writingId = intent.getLongExtra("WRITING_ID", -1).takeIf { it != -1L }
+            val firestoreDocId = intent.getStringExtra("FIRESTORE_DOC_ID")
+            viewModel.setCurrentWritingId(writingId, firestoreDocId)
         }
 
         // Observe ViewModel data
@@ -176,6 +180,6 @@ class WriteActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         // Auto-save on pause
-        viewModel.saveContent()
+        viewModel.saveContent(isAutoSave = true)
     }
 }

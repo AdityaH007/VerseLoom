@@ -1,4 +1,4 @@
-package com.example.verseloom
+package com.example.verseloom.viewmodel
 
 import android.view.Gravity
 import androidx.core.content.ContextCompat
@@ -50,16 +50,24 @@ class WriteViewModel @Inject constructor(
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> get() = _errorMessage
 
-    // Current Writing ID (for Room) - No longer needed for saving
+    // Current Writing ID (for Room)
     private var currentWritingId: Long? = null
+    private var currentFirestoreDocId: String? = null // For Firestore document ID when editing
 
-    init {
-        // Start with a blank slate
+    // Debounce save operations
+    private var lastSaveTime: Long = 0
+    private val saveCooldown = 2000L // 2 seconds cooldown
+    private var lastSavedContent: String? = null // Track the last saved content
+
+    fun setCurrentWritingId(writingId: Long?, firestoreDocId: String?) {
+        this.currentWritingId = writingId
+        this.currentFirestoreDocId = firestoreDocId
     }
 
     fun loadDraftContent(draftContent: String) {
         _content.value = draftContent
         updateWordCount(draftContent)
+        lastSavedContent = draftContent // Set as the last saved content
     }
 
     fun updateContent(newContent: String) {
@@ -96,20 +104,33 @@ class WriteViewModel @Inject constructor(
         _backgroundColor.value = colorRes
     }
 
-    fun saveContent() {
-        val uid = auth.currentUser?.uid ?: run {
-            _errorMessage.postValue("User not authenticated")
+    fun saveContent(isAutoSave: Boolean = false) {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastSaveTime < saveCooldown) {
+            // Skip save if within cooldown period
             return
         }
+
         val contentToSave = _content.value?.takeIf { it.isNotBlank() } ?: run {
-            _errorMessage.postValue("Content is empty")
+            if (!isAutoSave) _errorMessage.postValue("Content is empty")
             return
         }
+
+        // Skip auto-save if content hasn't changed
+        if (isAutoSave && contentToSave == lastSavedContent) {
+            return
+        }
+
+        val uid = auth.currentUser?.uid ?: run {
+            if (!isAutoSave) _errorMessage.postValue("User not authenticated")
+            return
+        }
+
         viewModelScope.launch {
             try {
-                // Save to Room - Always create a new Writing instance
+                // Save to Room
                 val writing = Writing(
-                    id = 0, // Let Room auto-generate a new ID
+                    id = currentWritingId ?: 0, // Use existing ID if editing, otherwise 0 for new
                     userId = uid,
                     content = contentToSave, // Store as HTML
                     lastModified = System.currentTimeMillis()
@@ -117,20 +138,32 @@ class WriteViewModel @Inject constructor(
                 val insertedId = withContext(Dispatchers.IO) {
                     userDao.upsertWriting(writing)
                 }
-                // Update currentWritingId for reference (optional)
-                currentWritingId = insertedId
+                if (currentWritingId == null) {
+                    currentWritingId = insertedId // Update ID only if creating a new entry
+                }
 
-                // Save to Firestore under users/{uid}/works
+                // Save to Firestore
                 val data = hashMapOf(
                     "content" to contentToSave, // Store as HTML
                     "timestamp" to System.currentTimeMillis()
                 )
-                firestore.collection("users").document(uid)
-                    .collection("works").document(UUID.randomUUID().toString()).set(data).await()
+                if (currentFirestoreDocId != null) {
+                    // Update existing Firestore document
+                    firestore.collection("users").document(uid)
+                        .collection("works").document(currentFirestoreDocId!!).set(data).await()
+                } else {
+                    // Create new Firestore document
+                    val docRef = firestore.collection("users").document(uid)
+                        .collection("works").document()
+                    docRef.set(data).await()
+                    currentFirestoreDocId = docRef.id // Update Firestore document ID
+                }
 
-                _errorMessage.postValue("Saved successfully")
+                lastSaveTime = System.currentTimeMillis()
+                lastSavedContent = contentToSave
+                if (!isAutoSave) _errorMessage.postValue("Saved successfully")
             } catch (e: Exception) {
-                _errorMessage.postValue("Failed to save: ${e.message}")
+                if (!isAutoSave) _errorMessage.postValue("Failed to save: ${e.message}")
             }
         }
     }
@@ -150,11 +183,17 @@ class WriteViewModel @Inject constructor(
                     "content" to contentToPublish, // Store as HTML
                     "userName" to userName,
                     "timestamp" to System.currentTimeMillis(),
-                    "comments" to emptyList<String>()
+                    "comments" to emptyList<String>(),
+                    "likes" to 0,
+                    "likedBy" to emptyList<String>()
                 )
                 firestore.collection("published_works").add(data).await()
                 _errorMessage.postValue("Published successfully")
                 updateContent("") // Clear the EditText after publishing
+                // Reset IDs after publishing
+                currentWritingId = null
+                currentFirestoreDocId = null
+                lastSavedContent = null
             } catch (e: Exception) {
                 _errorMessage.postValue("Failed to publish: ${e.message}")
             }

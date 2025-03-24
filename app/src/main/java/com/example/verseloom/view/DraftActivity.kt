@@ -64,9 +64,15 @@ class DraftActivity : AppCompatActivity() {
         // Add click listener to edit drafts
         lvDrafts.setOnItemClickListener { _, _, position, _ ->
             val draft = adapter.getItem(position) ?: return@setOnItemClickListener
-            // Navigate to WriteActivity with the draft content
+            // Navigate to WriteActivity with the draft content and IDs
             val intent = Intent(this, WriteActivity::class.java).apply {
                 putExtra("DRAFT_CONTENT", draft.content)
+                // Pass the writing ID if the draft is from Room
+                if (draft.source == "Room") {
+                    putExtra("WRITING_ID", draft.id.toLong())
+                }
+                // Pass the Firestore document ID
+                putExtra("FIRESTORE_DOC_ID", draft.id)
             }
             startActivity(intent)
         }
